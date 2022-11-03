@@ -15,7 +15,6 @@ import {
   View,
   ViewProps,
 } from 'react-native';
-import Backdrop from './Backdrop';
 import Popover, { PopoverProps } from './Popover';
 import type { PopableManager } from './use-popable/types';
 
@@ -204,46 +203,11 @@ const Popable = forwardRef<PopableManager, PopableProps>(function Popable(
 
   return (
     <View style={[styles.container, wrapperStyle]}>
-      <Backdrop
-        visible={isInteractive && popoverVisible}
-        onPress={handleHidePopover}
-        popoverRef={popoverRef}
-        childrenRef={childrenRef}
-      >
-        {
-          // Backdrop renders the same popover because:
-          // since the backdrop adds a layer on top of the screen to
-          // detect any "outside popover press", the inner popover becomes
-          // unreachable: the upper layer would keep all the touch events.
-          // Because the backdrop uses a modal as a layer, we render that
-          // same popover inside the modal, and hide the initial one
-          // underneath (which explains why the popover below this one has
-          // `visible` set to `false`)
-          Platform.OS !== 'web' && (
-            <Popover
-              {...sharedPopoverProps}
-              forceInitialAnimation
-              visible={isPopoverVisible}
-              style={[
-                {
-                  position: 'absolute',
-                  transform: [
-                    { translateX: popoverPagePosition.left },
-                    { translateY: popoverPagePosition.top },
-                  ],
-                },
-                style,
-              ]}
-            />
-          )
-        }
-      </Backdrop>
-
       <Popover
         ref={popoverRef}
         {...sharedPopoverProps}
         onLayout={handlePopoverLayout}
-        visible={Platform.OS === 'web' ? isPopoverVisible : false}
+        visible={isPopoverVisible}
         style={[
           computedPosition === 'top' && styles.popoverTop,
           computedPosition === 'bottom' && styles.popoverBottom,
