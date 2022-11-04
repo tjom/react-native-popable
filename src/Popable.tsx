@@ -7,9 +7,6 @@ import React, {
   useState,
 } from 'react';
 import {
-  Platform,
-  // @ts-ignore
-  Pressable,
   StyleSheet,
   useWindowDimensions,
   View,
@@ -45,7 +42,6 @@ const DEFAULT_LAYOUT = {
 
 const Popable = forwardRef<PopableManager, PopableProps>(function Popable(
   {
-    action = 'press',
     animated,
     animationType,
     backgroundColor,
@@ -54,7 +50,6 @@ const Popable = forwardRef<PopableManager, PopableProps>(function Popable(
     caretPosition,
     content,
     numberOfLines,
-    onAction,
     position = 'top',
     strictPosition = false,
     style,
@@ -78,35 +73,6 @@ const Popable = forwardRef<PopableManager, PopableProps>(function Popable(
     show: () => setPopoverVisible(true),
     hide: () => setPopoverVisible(false),
   }));
-
-  const handlers: { [prop: string]: () => void } = {};
-
-  if (isInteractive) {
-    if (action === 'hover' && Platform.OS === 'web') {
-      handlers.onHoverIn = () => {
-        setPopoverVisible(true);
-        onAction?.(true);
-      };
-
-      handlers.onHoverOut = () => {
-        setPopoverVisible(false);
-        onAction?.(false);
-      };
-    } else if (
-      action === 'press' ||
-      (action === 'hover' && Platform.OS !== 'web')
-    ) {
-      handlers.onPress = () => {
-        onAction?.(!visible);
-        setPopoverVisible(!visible);
-      };
-    } else {
-      handlers.onLongPress = () => {
-        onAction?.(!visible);
-        setPopoverVisible(!visible);
-      };
-    }
-  }
 
   const handlePopoverLayout = useCallback(() => {
     popoverRef.current?.measureInWindow((x, y, width, height) => {
@@ -210,13 +176,12 @@ const Popable = forwardRef<PopableManager, PopableProps>(function Popable(
         ]}
       />
 
-      <Pressable
+      <View
         ref={childrenRef}
         onLayout={handleChildrenLayout}
-        {...handlers}
       >
         {children}
-      </Pressable>
+      </View>
     </View>
   );
 });
